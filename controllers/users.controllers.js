@@ -210,28 +210,3 @@ export const remove = async (req, res) => {
   }
 };
 
-
-export const renovarToken = async (req, res) => {
-  try {
-    const user = req.user;
-
-    if (!user) {
-      return res.status(401).json({
-        message: "Usuario no autenticado",
-      });
-    }
-
-    const token = createToken(user);
-
-    res.status(200).json({
-      message: "Token renovado con éxito",
-      user,
-      token,
-    });
-  } catch (error) {
-    console.error("Error al renovar el token:", error);
-    res.status(500).json({
-      message: "Error al renovar el token",
-    });
-  }
-};
