@@ -121,15 +121,7 @@ export const profile = async (req, res) => {
 
 export const update = async (req, res) => {
   try {
-    const userIdFromToken = req.user.id;
     const userIdToUpdate = req.params.id;
-
-    if (userIdFromToken !== userIdToUpdate) {
-      return res.status(403).json({
-        status: "error",
-        message: "No tienes permiso para actualizar este usuario.",
-      });
-    }
 
     const { password, email, name, ...otherFields } = req.body;
 
@@ -144,7 +136,7 @@ export const update = async (req, res) => {
     if (email) {
       const existingUser = await User.findOne({
         email,
-        _id: { $ne: userIdFromToken },
+        _id: { $ne: userIdToUpdate },
       });
       if (existingUser) {
         return res.status(400).json({
@@ -160,7 +152,7 @@ export const update = async (req, res) => {
     }
 
     const userUpdated = await User.findByIdAndUpdate(
-      userIdFromToken,
+      userIdToUpdate,
       {
         ...(name && { name }),
         ...(email && { email }),
@@ -190,6 +182,7 @@ export const update = async (req, res) => {
     });
   }
 };
+
 
 export const remove = async (req, res) => {
   try {
