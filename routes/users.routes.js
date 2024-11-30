@@ -18,6 +18,6 @@ router.get("/profile/:id", verifyToken, profile);
 router.put("/update/:id", verifyToken, update);
 router.delete("/remove/:id", verifyToken, verifyAdmin, remove);
 
-router.get("/renew", verifyToken, renovarToken);
+
 
 export default router;
