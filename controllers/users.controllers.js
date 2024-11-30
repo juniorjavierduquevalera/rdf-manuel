@@ -186,16 +186,7 @@ export const update = async (req, res) => {
 
 export const remove = async (req, res) => {
   try {
-    const userIdFromToken = req.user.id;
-
-    const userIdToDelete = req.params.id || req.body.id;
-
-    if (userIdFromToken !== userIdToDelete) {
-      return res.status(403).json({
-        status: "error",
-        message: "No tienes permiso para eliminar este usuario",
-      });
-    }
+    const userIdToDelete = req.params.id;
 
     const userDeleted = await User.findByIdAndDelete(userIdToDelete);
 
@@ -218,6 +209,7 @@ export const remove = async (req, res) => {
     });
   }
 };
+
 
 export const renovarToken = async (req, res) => {
   try {
