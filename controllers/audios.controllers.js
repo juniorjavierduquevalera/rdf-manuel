@@ -79,19 +79,50 @@ export const createAudio = async (req, res) => {
   }
 };
 
-export const getAudiosByColeccion = async (req, res) => {
+export const getAllAudios = async (req, res) => {
   try {
-    const { idColeccion } = req.params;
-
-    const audios = await Audio.find({ idColeccion });
+    const audios = await Audio.find(); // Recupera todos los audios
     res.status(200).json(audios);
   } catch (error) {
-    console.error("Error al obtener los audios:", error);
+    console.error("Error al obtener todos los audios:", error);
     res
       .status(500)
-      .json({ message: "Error al obtener los audios", error: error.message });
+      .json({
+        message: "Error al obtener todos los audios",
+        error: error.message,
+      });
   }
 };
+
+export const getAudiosByColeccion = async (req, res) => {
+    try {
+      const { idColeccion } = req.params;
+  
+      // Validar que el ID de colección sea válido
+      if (!mongoose.Types.ObjectId.isValid(idColeccion)) {
+        return res.status(400).json({ message: "ID de colección inválido" });
+      }
+  
+      // Consultar directamente en el modelo Audio
+      const audios = await Audio.find({ idColeccion });
+  
+      // Verificar si no hay audios relacionados
+      if (audios.length === 0) {
+        return res
+          .status(404)
+          .json({ message: "No se encontraron audios para esta colección" });
+      }
+  
+      // Responder con los audios encontrados
+      res.status(200).json(audios);
+    } catch (error) {
+      console.error("Error al obtener los audios:", error);
+      res.status(500).json({
+        message: "Error al obtener los audios",
+        error: error.message,
+      });
+    }
+  };
 
 export const getAudioById = async (req, res) => {
   try {

@@ -1,6 +1,7 @@
 import express from "express";
 import {
   createAudio,
+  getAllAudios,
   getAudiosByColeccion,
   getAudioById,
   updateAudio,
@@ -22,6 +23,7 @@ router.post(
   createAudio
 );
 
+router.get("/", verifyToken, getAllAudios);
 router.get("/coleccion/:idColeccion", verifyToken, getAudiosByColeccion);
 
 router.get("/:id", verifyToken, getAudioById);
