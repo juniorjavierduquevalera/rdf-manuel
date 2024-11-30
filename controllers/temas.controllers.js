@@ -1,4 +1,6 @@
 import Tema from "../models/temas.model.js";
+import Coleccion from "../models/colecciones.model.js";
+import Audio from "../models/audios.model.js";
 import { uploadToS3, deleteFromS3 } from "../services/s3Service.js";
 import { deleteLocalFile } from "../services/fileService.js";
 
@@ -47,6 +49,7 @@ export const createTema = async (req, res) => {
 export const getTemas = async (req, res) => {
   try {
     const temas = await Tema.find();
+    console.log(req.cookies.access_token);
     res.status(200).json(temas);
   } catch (error) {
     res
@@ -130,6 +133,14 @@ export const deleteTema = async (req, res) => {
       return res.status(404).json({ message: "Tema no encontrado" });
     }
 
+    const colecciones = await Coleccion.find({ idTema: tema._id });
+
+    for (const coleccion of colecciones) {
+      await Audio.deleteMany({ idColeccion: coleccion._id });
+    }
+
+    await Coleccion.deleteMany({ idTema: tema._id });
+
     const keysToDelete = [
       tema.imgSmall.split(".com/")[1],
       tema.imgLarge.split(".com/")[1],
@@ -138,7 +149,9 @@ export const deleteTema = async (req, res) => {
 
     await Tema.deleteOne({ _id: tema._id });
 
-    res.status(200).json({ message: "Tema eliminado con éxito" });
+    res.status(200).json({
+      message: "Tema, colecciones y audios asociados eliminados con éxito",
+    });
   } catch (error) {
     console.error("Error al eliminar el tema:", error);
     res

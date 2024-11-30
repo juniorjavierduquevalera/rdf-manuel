@@ -20,8 +20,11 @@ router.post(
   ]),
   createTema
 );
+
 router.get("/", verifyToken, getTemas);
+
 router.get("/:id", getTemaById);
+
 router.put(
   "/:id",
   verifyToken,
@@ -31,6 +34,7 @@ router.put(
   ]),
   updateTema
 );
+
 router.delete("/:id", verifyToken, deleteTema);
 
 export default router;

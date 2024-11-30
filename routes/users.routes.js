@@ -11,12 +11,11 @@ import { verifyToken } from "../middlewares/verifyToken.js";
 
 const router = express.Router();
 
-// Rutas de usuario
 router.post("/register", register);
 router.post("/login", login);
-router.get("/profile/:id", verifyToken, profile); 
-router.put("/update/:id", verifyToken, update); 
-router.delete("/remove/:id", verifyToken, remove); 
+router.get("/profile/:id", verifyToken, profile);
+router.put("/update/:id", verifyToken, update);
+router.delete("/remove/:id", verifyToken, remove);
 router.get("/renew", verifyToken, renovarToken);
 router.post("/logout", verifyToken, renovarToken);
 

@@ -23,12 +23,17 @@ export const login = async (req, res) => {
       });
     }
 
-    const token = createToken(user);
+    const token = createToken({
+      id: user._id,
+      email: user.email,
+      role: user.role,
+    });
 
     res.cookie("access_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
+      path: "/",
       maxAge: 24 * 60 * 60 * 1000,
     });
 
@@ -43,6 +48,7 @@ export const login = async (req, res) => {
       token,
     });
   } catch (error) {
+    console.error("Error en login:", error);
     return res.status(500).send({
       status: "error",
       message: error.message || "Error desconocido.",
@@ -252,7 +258,6 @@ export const logout = (req, res) => {
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
     });
-
     res.status(200).json({
       status: "success",
       message: "Sesión cerrada correctamente.",
