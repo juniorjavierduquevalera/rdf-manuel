@@ -6,7 +6,7 @@ import {
   updateTema,
   deleteTema,
 } from "../controllers/temas.controllers.js";
-import { verifyToken } from "../middlewares/verifyToken.js";
+import { verifyToken } from "../middlewares/auth.js";
 import { upload } from "../helpers/multer.js";
 
 const router = express.Router();
@@ -21,7 +21,7 @@ router.post(
   createTema
 );
 
-router.get("/", verifyToken, getTemas);
+router.get("/", getTemas);
 
 router.get("/:id", getTemaById);
 

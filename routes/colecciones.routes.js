@@ -7,7 +7,7 @@ import {
   updateColeccion,
   deleteColeccion,
 } from "../controllers/colecciones.controllers.js";
-import { verifyToken } from "../middlewares/verifyToken.js";
+import { verifyToken } from "../middlewares/auth.js";
 import { upload } from "../helpers/multer.js";
 
 const router = express.Router();
@@ -23,8 +23,8 @@ router.post(
   createColeccion
 );
 
-router.get("/", verifyToken, getAllColecciones);
-router.get("/tema/:idTema", verifyToken, getColeccionesByTema);
+router.get("/", getAllColecciones);
+router.get("/tema/:idTema", getColeccionesByTema);
 router.get("/:id", verifyToken, getColeccionById);
 router.put(
   "/:id",

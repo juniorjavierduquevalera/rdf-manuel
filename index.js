@@ -5,7 +5,7 @@ import cookieParser from "cookie-parser";
 import usersRoutes from "./routes/users.routes.js";
 import temasRoutes from "./routes/temas.routes.js";
 import coleccionesRoutes from "./routes/colecciones.routes.js";
-import audiosRoutes from "./routes/audios.routes.js"; // Importa las rutas de audios
+import audiosRoutes from "./routes/audios.routes.js";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -14,9 +14,8 @@ connection();
 const app = express();
 const port = process.env.PORT || 3910;
 
-// Middlewares
 const corsOptions = {
-  origin: "http://127.0.0.1:5500",
+  origin: "*",
   credentials: true,
 };
 app.use(cors(corsOptions));

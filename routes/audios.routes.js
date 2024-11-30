@@ -7,7 +7,7 @@ import {
   updateAudio,
   deleteAudio,
 } from "../controllers/audios.controllers.js";
-import { verifyToken } from "../middlewares/verifyToken.js";
+import { verifyToken } from "../middlewares/auth.js";
 import { upload } from "../helpers/multer.js";
 
 const router = express.Router();
@@ -23,10 +23,10 @@ router.post(
   createAudio
 );
 
-router.get("/", verifyToken, getAllAudios);
-router.get("/coleccion/:idColeccion", verifyToken, getAudiosByColeccion);
+router.get("/", getAllAudios);
+router.get("/coleccion/:idColeccion", getAudiosByColeccion);
 
-router.get("/:id", verifyToken, getAudioById);
+router.get("/:id", getAudioById);
 
 router.put(
   "/:id",

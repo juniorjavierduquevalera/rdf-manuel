@@ -7,7 +7,7 @@ import {
   remove,
   renovarToken,
 } from "../controllers/users.controllers.js";
-import { verifyToken } from "../middlewares/verifyToken.js";
+import { verifyToken } from "../middlewares/auth.js";
 
 const router = express.Router();
 
@@ -17,6 +17,6 @@ router.get("/profile/:id", verifyToken, profile);
 router.put("/update/:id", verifyToken, update);
 router.delete("/remove/:id", verifyToken, remove);
 router.get("/renew", verifyToken, renovarToken);
-router.post("/logout", verifyToken, renovarToken);
+
 
 export default router;

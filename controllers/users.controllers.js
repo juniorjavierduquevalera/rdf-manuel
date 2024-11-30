@@ -29,14 +29,6 @@ export const login = async (req, res) => {
       role: user.role,
     });
 
-    res.cookie("access_token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      path: "/",
-      maxAge: 24 * 60 * 60 * 1000,
-    });
-
     return res.status(200).send({
       status: "success",
       message: "Inicio de sesión exitoso.",
@@ -80,9 +72,20 @@ export const register = async (req, res) => {
 
     await newUser.save();
 
+    const token = createToken({
+      id: newUser._id,
+      email: newUser.email,
+      role: newUser.role || "user",
+    });
+
     return res.status(200).send({
       status: "success",
       message: "Usuario registrado correctamente",
+      user: {
+        name: newUser.name,
+        email: newUser.email,
+      },
+      token,
     });
   } catch (error) {
     return res.status(400).send({
@@ -92,26 +95,28 @@ export const register = async (req, res) => {
   }
 };
 
-export const profile = (req, res) => {
-  const { id, name, email, role } = req.user;
-  const userIdentity = req.params.id;
-
-  if (userIdentity !== id) {
-    return res.status(403).json({
+export const profile = async (req, res) => {
+  try {
+    const userIdFromParams = req.params.id;
+    const user = await User.findById(userIdFromParams).select("-password -__v");
+    if (!user) {
+      return res.status(404).json({
+        status: "error",
+        message: "Usuario no encontrado.",
+      });
+    }
+    res.status(200).json({
+      status: "success",
+      profile: user,
+    });
+  } catch (error) {
+    console.error("Error al obtener el perfil:", error);
+    res.status(500).json({
       status: "error",
-      message: "No tienes permiso para ver este perfil",
+      message: "Error en el servidor.",
+      error: error.message,
     });
   }
-
-  res.status(200).json({
-    status: "success",
-    profile: {
-      id,
-      name,
-      email,
-      role,
-    },
-  });
 };
 
 export const update = async (req, res) => {
@@ -177,6 +182,7 @@ export const update = async (req, res) => {
       user: userUpdated,
     });
   } catch (error) {
+    console.error("Error al actualizar el usuario:", error);
     res.status(500).json({
       status: "error",
       message: "Error en el servidor.",
@@ -232,41 +238,15 @@ export const renovarToken = async (req, res) => {
 
     const token = createToken(user);
 
-    res.cookie("access_token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 24 * 60 * 60 * 1000,
-    });
-
     res.status(200).json({
       message: "Token renovado con éxito",
       user,
+      token,
     });
   } catch (error) {
     console.error("Error al renovar el token:", error);
     res.status(500).json({
       message: "Error al renovar el token",
-    });
-  }
-};
-
-export const logout = (req, res) => {
-  try {
-    res.clearCookie("access_token", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-    });
-    res.status(200).json({
-      status: "success",
-      message: "Sesión cerrada correctamente.",
-    });
-  } catch (error) {
-    console.error("Error al cerrar sesión:", error);
-    res.status(500).json({
-      status: "error",
-      message: "Error al cerrar sesión.",
     });
   }
 };
