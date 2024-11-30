@@ -8,6 +8,7 @@ import {
   deleteAudio,
 } from "../controllers/audios.controllers.js";
 import { verifyToken } from "../middlewares/auth.js";
+import { verifyAdmin } from "../middlewares/verifyAdmin.js"; 
 import { upload } from "../helpers/multer.js";
 
 const router = express.Router();
@@ -39,6 +40,6 @@ router.put(
   updateAudio
 );
 
-router.delete("/:id", verifyToken, deleteAudio);
+router.delete("/:id", verifyToken, verifyAdmin, deleteAudio);
 
 export default router;

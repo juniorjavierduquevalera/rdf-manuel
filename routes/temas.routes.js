@@ -7,6 +7,7 @@ import {
   deleteTema,
 } from "../controllers/temas.controllers.js";
 import { verifyToken } from "../middlewares/auth.js";
+import { verifyAdmin } from "../middlewares/verifyAdmin.js"; 
 import { upload } from "../helpers/multer.js";
 
 const router = express.Router();
@@ -35,6 +36,6 @@ router.put(
   updateTema
 );
 
-router.delete("/:id", verifyToken, deleteTema);
+router.delete("/:id", verifyToken, verifyAdmin, deleteTema);
 
 export default router;

@@ -8,11 +8,12 @@ import {
   deleteColeccion,
 } from "../controllers/colecciones.controllers.js";
 import { verifyToken } from "../middlewares/auth.js";
+import { verifyAdmin } from "../middlewares/verifyAdmin.js"; 
 import { upload } from "../helpers/multer.js";
 
 const router = express.Router();
 
-// Crear una colección
+
 router.post(
   "/",
   verifyToken,
@@ -35,6 +36,7 @@ router.put(
   ]),
   updateColeccion
 );
-router.delete("/:id", verifyToken, deleteColeccion);
+
+router.delete("/:id", verifyToken, verifyAdmin, deleteColeccion);
 
 export default router;
