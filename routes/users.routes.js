@@ -5,7 +5,6 @@ import {
   profile,
   update,
   remove,
-  renovarToken,
 } from "../controllers/users.controllers.js";
 import { verifyToken } from "../middlewares/auth.js";
 import { verifyAdmin } from "../middlewares/verifyAdmin.js"; 
