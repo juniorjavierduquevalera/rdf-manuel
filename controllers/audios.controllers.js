@@ -78,10 +78,21 @@ export const createAudio = async (req, res) => {
       .json({ message: "Error al crear el audio", error: error.message });
   }
 };
-
 export const getAllAudios = async (req, res) => {
   try {
-    const audios = await Audio.find(); 
+    const { name, track } = req.query;
+    const filter = {};
+    if (name) {
+      filter.name = { $regex: name, $options: "i" };
+    }
+    if (track) {
+      const trackFilter = isNaN(track)
+        ? { $regex: track, $options: "i" }
+        : track;
+      filter.track = trackFilter;
+    }
+    const audios = await Audio.find(filter);
+
     res.status(200).json(audios);
   } catch (error) {
     console.error("Error al obtener todos los audios:", error);
@@ -91,7 +102,6 @@ export const getAllAudios = async (req, res) => {
     });
   }
 };
-
 export const getAudiosByColeccion = async (req, res) => {
   try {
     const { idColeccion } = req.params;
@@ -117,7 +127,6 @@ export const getAudiosByColeccion = async (req, res) => {
     });
   }
 };
-
 export const getAudioById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -135,7 +144,6 @@ export const getAudioById = async (req, res) => {
       .json({ message: "Error al obtener el audio", error: error.message });
   }
 };
-
 export const updateAudio = async (req, res) => {
   try {
     const { id } = req.params;
@@ -213,7 +221,6 @@ export const updateAudio = async (req, res) => {
       .json({ message: "Error al actualizar el audio", error: error.message });
   }
 };
-
 export const deleteAudio = async (req, res) => {
   try {
     const { id } = req.params;
