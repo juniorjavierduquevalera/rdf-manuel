@@ -48,7 +48,9 @@ export const createTema = async (req, res) => {
 
 export const getTemas = async (req, res) => {
   try {
-    const temas = await Tema.find();
+    const { name } = req.query;
+    const query = name ? { name: new RegExp(name, "i") } : {};
+    const temas = await Tema.find(query);
     console.log(req.cookies.access_token);
     res.status(200).json(temas);
   } catch (error) {

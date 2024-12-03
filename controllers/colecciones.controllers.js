@@ -55,10 +55,13 @@ export const createColeccion = async (req, res) => {
 
 export const getAllColecciones = async (req, res) => {
   try {
-    const colecciones = await Coleccion.find().populate(
+    const { name } = req.query;
+    const query = name ? { name: new RegExp(name, "i") } : {};
+    const colecciones = await Coleccion.find(query).populate(
       "idTema",
       "name description"
     );
+
     res.status(200).json(colecciones);
   } catch (error) {
     console.error("Error al obtener todas las colecciones:", error);

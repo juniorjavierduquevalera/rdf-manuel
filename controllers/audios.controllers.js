@@ -81,7 +81,7 @@ export const createAudio = async (req, res) => {
 
 export const getAllAudios = async (req, res) => {
   try {
-    const audios = await Audio.find(); // Recupera todos los audios
+    const audios = await Audio.find(); 
     res.status(200).json(audios);
   } catch (error) {
     console.error("Error al obtener todos los audios:", error);
