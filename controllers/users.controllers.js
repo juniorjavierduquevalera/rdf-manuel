@@ -227,7 +227,7 @@ export const recovery = async (req, res) => {
     };
     const token = jwt.encode(payload, secret);
 
-    const resetLink = `http://127.0.0.1:5500/index.html?token=${token}`;
+    const resetLink = `http://127.0.0.1:5500/index.html?token=${token}`; //usa el de tu front//
 
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
