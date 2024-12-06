@@ -2,6 +2,11 @@ import User from "../models/users.model.js";
 import bcrypt from "bcrypt";
 import { validate } from "../helpers/validate.js";
 import { createToken } from "../helpers/jwt.js";
+import nodemailer from "nodemailer";
+import jwt from "jwt-simple";
+import moment from "moment";
+
+const secret = process.env.SECRET_KEY;
 
 export const login = async (req, res) => {
   try {
@@ -47,7 +52,6 @@ export const login = async (req, res) => {
     });
   }
 };
-
 export const register = async (req, res) => {
   try {
     const params = req.body;
@@ -94,7 +98,6 @@ export const register = async (req, res) => {
     });
   }
 };
-
 export const profile = async (req, res) => {
   try {
     const userIdFromParams = req.params.id;
@@ -118,7 +121,6 @@ export const profile = async (req, res) => {
     });
   }
 };
-
 export const update = async (req, res) => {
   try {
     const userIdToUpdate = req.params.id;
@@ -182,8 +184,6 @@ export const update = async (req, res) => {
     });
   }
 };
-
-
 export const remove = async (req, res) => {
   try {
     const userIdToDelete = req.params.id;
@@ -209,4 +209,93 @@ export const remove = async (req, res) => {
     });
   }
 };
+export const recovery = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
+        status: "error",
+        message: "No se encontró un usuario con ese correo.",
+      });
+    }
+    const payload = {
+      id: user._id,
+      email: user.email,
+      iat: moment().unix(),
+      exp: moment().add(15, "minutes").unix(),
+    };
+    const token = jwt.encode(payload, secret);
 
+    const resetLink = `http://127.0.0.1:5500/index.html?token=${token}`;
+
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: "juniorjavierduquevalera@gmail.com",
+        pass: "ozywrowkhyabwmjo",
+      },
+    });
+
+    await transporter.sendMail({
+      from: '"Soporte" <juniorjavierduquevalera@gmail.com>',
+      to: email,
+      subject: "Recuperación de Contraseña",
+      text: `Hola, por favor utiliza el siguiente enlace para restablecer tu contraseña: ${resetLink}`,
+      html: `<p>Hola, por favor utiliza el siguiente enlace para restablecer tu contraseña:</p><a href="${resetLink}">${resetLink}</a>`,
+    });
+
+    return res.status(200).json({
+      status: "success",
+      message: "Correo de recuperación enviado.",
+    });
+  } catch (error) {
+    console.error("Error en recuperación de contraseña:", error);
+    return res.status(500).json({
+      status: "error",
+      message: "Error en el servidor.",
+    });
+  }
+};
+export const changePassword = async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+    let payload;
+    try {
+      payload = jwt.decode(token, secret);
+      if (payload.exp <= moment().unix()) {
+        return res.status(400).json({
+          status: "error",
+          message: "El token ha expirado.",
+        });
+      }
+    } catch (error) {
+      return res.status(400).json({
+        status: "error",
+        message: "El token es inválido.",
+      });
+    }
+    const user = await User.findById(payload.id);
+    if (!user) {
+      return res.status(404).json({
+        status: "error",
+        message: "Usuario no encontrado.",
+      });
+    }
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+    return res.status(200).json({
+      status: "success",
+      message: "Contraseña actualizada correctamente.",
+    });
+  } catch (error) {
+    console.error("Error al cambiar la contraseña:", error);
+    return res.status(500).json({
+      status: "error",
+      message: "Error en el servidor.",
+    });
+  }
+};
